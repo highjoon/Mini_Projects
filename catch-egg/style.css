@@ -27,12 +27,13 @@
     margin: 0 auto;
     text-align: center;
 }
+
 .game {
     display: flex;
     flex-direction: column;
     position: relative;
     background: url("./img/background.png");
-    background-size: 1000px 700px;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     width: 1000px;
@@ -53,6 +54,10 @@ header {
     height: var(--size-button);
     cursor: pointer;
     transition: transfrom var(--transition-duration) ease-in;
+}
+
+.game__button:hover {
+    transform: scale(1.1);
 }
 
 .fas {
@@ -83,13 +88,32 @@ header {
     background: var(--color-white);
 }
 
-.game__button:hover {
-    transform: scale(1.1);
-}
-
 .game__field {
     width: 100%;
     height: 100%;
+}
+
+.chicken__farm {
+    width: 100%;
+}
+
+.chicken {
+    width: 90px;
+    height: 90px;
+    margin: 0 30px;
+}
+
+.basket__line {
+    width: 100%;
+    height: 100px;
+    /* background-color: var(--color-light-black); */
+}
+
+.basket {
+    width: 150px;
+    height: 100px;
+    position: absolute;
+    transform: translate(-50%, -50%);
 }
 
 .pop-up {
