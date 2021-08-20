@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Catch Carrot</title>
+        <title>Catch Eggs</title>
         <script src="https://kit.fontawesome.com/9eb162ac0d.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="style.css" />
         <script src="./src/main.js" defer></script>
@@ -18,13 +18,26 @@
                 <span class="game__timer">00:00</span>
                 <span class="game__score">0</span>
             </header>
-            <section class="game__field"></section>
+            <section class="game__field">
+                <!-- <section class="chicken__farm hide"> -->
+                <section class="chicken__farm">
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                    <img class="chicken" src="./img/chicken.png" alt="chicken" />
+                </section>
+            </section>
+            <section class="basket__line">
+                <img src="./img/wicker-basket.png" alt="basket" class="basket" />
+            </section>
         </section>
         <section class="pop-up hide">
             <button class="pop-up__refresh">
                 <i class="fas fa-redo"></i>
             </button>
-            <span class="pop-up__message">You have WON!!!</span>
+            <span class="pop-up__message">Congraturations👏👏</span>
         </section>
     </body>
 </html>
