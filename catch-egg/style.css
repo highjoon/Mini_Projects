@@ -1,0 +1,128 @@
+:root {
+    /* color */
+    --color-black: #000000;
+    --color-light-black: #00000090;
+    --color-white: #ffffff;
+
+    /* size */
+    --size-button: 70px;
+    --size-button-font: 40px;
+    --size-timer-width: 100px;
+    --size-timer-height: 45px;
+    --size-score: 45px;
+    --size-timer-font: 32px;
+    --size-score-font: 32px;
+
+    /* duration */
+    --transition-duration: 300ms;
+
+    /* radius */
+    --button-radius: 10px;
+
+    /* margin */
+    --timer-score-margin: 10px;
+}
+
+* {
+    margin: 0 auto;
+    text-align: center;
+}
+.game {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: url("./img/background.png");
+    background-size: 1000px 700px;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 1000px;
+    height: 700px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+header {
+    padding: 8px;
+}
+
+.game__button {
+    background: var(--color-black);
+    border: 5px solid var(--color-black);
+    border-radius: var(--button-radius);
+    width: var(--size-button);
+    height: var(--size-button);
+    cursor: pointer;
+    transition: transfrom var(--transition-duration) ease-in;
+}
+
+.fas {
+    color: var(--color-white);
+    font-size: var(--size-button-font);
+}
+
+.game__timer {
+    position: absolute;
+    right: 0;
+    margin-right: var(--timer-score-margin);
+    width: var(--size-timer-width);
+    height: var(--size-timer-height);
+    padding: 0 20px;
+    font-size: var(--size-timer-font);
+    background: var(--color-white);
+    border: 5px solid var(--color-black);
+}
+
+.game__score {
+    position: absolute;
+    left: 0;
+    margin-left: var(--timer-score-margin);
+    width: var(--size-score);
+    height: var(--size-score);
+    font-size: var(--size-score-font);
+    border: 5px solid var(--color-black);
+    background: var(--color-white);
+}
+
+.game__button:hover {
+    transform: scale(1.1);
+}
+
+.game__field {
+    width: 100%;
+    height: 100%;
+}
+
+.pop-up {
+    border-radius: 20px;
+    width: 400px;
+    height: 130px;
+    margin: auto;
+    background-color: var(--color-light-black);
+    color: var(--color-white);
+    transform: translateY(-400%);
+}
+
+.pop-up__refresh {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    background-color: var(--color-black);
+    border: 5px solid var(--color-black);
+    transition: transfrom 300ms ease-in;
+    cursor: pointer;
+    border-radius: var(--button-radius);
+    margin-top: 10px;
+}
+
+.pop-up__refresh:hover {
+    transform: scale(1.1);
+}
+
+.pop-up__message {
+    display: block;
+    font-size: 38px;
+}
+
+.hide {
+    visibility: hidden;
+}
