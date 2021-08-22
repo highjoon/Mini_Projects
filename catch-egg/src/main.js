@@ -1,5 +1,6 @@
 "use strict";
 let GAME_DURATION_SEC = 2;
+let CHICKEN_COUNT = 6;
 
 const gameBtn = document.querySelector(".game__button");
 const gameTimer = document.querySelector(".game__timer");
@@ -14,7 +15,7 @@ const popUpMessage = document.querySelector(".pop-up__message");
 
 const icon = gameBtn.querySelector(".fas");
 const chickenFarm = document.querySelector(".chicken__farm");
-const chicken = document.querySelector(".chicken");
+const chicken = document.querySelectorAll(".chicken");
 
 const basketLine = document.querySelector(".basket__line");
 const basket = document.querySelector(".basket");
@@ -28,6 +29,7 @@ const scoring = new Audio("./sound/scoring.mp3");
 
 let started = false;
 let timer = undefined;
+let spwaning = undefined;
 
 // 게임 버튼 클릭하여 시작 또는 중지
 gameBtn.addEventListener("click", () => {
@@ -48,6 +50,7 @@ function startGame() {
     playBgSound();
     showStopButton();
     showChickens();
+    spawnEggs();
 }
 
 // 게임 중지
@@ -126,6 +129,30 @@ function showChickens() {
 // 닭 숨기기
 function hideChickens() {
     chickenFarm.classList.add("hide");
+}
+
+const eggList = [];
+for (let i = 0; i < CHICKEN_COUNT; i++) {
+    eggList.push(chicken[i].getBoundingClientRect().x);
+    // console.log(chicken[i].getBoundingClientRect().y);
+}
+
+// 달걀 소환
+function spawnEggs() {
+    let min = 0;
+    let max = CHICKEN_COUNT;
+
+    spwaning = setInterval(() => {
+        let num = Math.floor(Math.random() * (max - min)) + min;
+        let egg = document.createElement("img");
+        egg.setAttribute("src", "./img/egg.png");
+        egg.setAttribute("alt", "egg");
+        egg.setAttribute("class", "egg");
+        egg.style.position = "absolute";
+        egg.style.left = `${eggList[num]}px`;
+        egg.style.top = `96px`;
+        chickenFarm.appendChild(egg);
+    }, 1500);
 }
 
 // 바구니 움직이기
