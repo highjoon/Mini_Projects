@@ -1,7 +1,8 @@
 "use strict";
 let GAME_DURATION_SEC = 2;
 let CHICKEN_COUNT = 6;
-let EGG_DURATION = 1000;
+let EGG_SPAWN_DURATION = 1000;
+let EGG_DROP_DURATION = 10;
 
 const gameBtn = document.querySelector(".game__button");
 const gameTimer = document.querySelector(".game__timer");
@@ -17,10 +18,15 @@ const popUpMessage = document.querySelector(".pop-up__message");
 const icon = gameBtn.querySelector(".fas");
 const chickenFarm = document.querySelector(".chicken__farm");
 const chicken = document.querySelectorAll(".chicken");
+let chickenHeight = chicken.y;
+
 const eggLine = document.querySelector(".egg__line");
 
 const basketLine = document.querySelector(".basket__line");
 const basket = document.querySelector(".basket");
+const basketLineRect = basketLine.getBoundingClientRect();
+const basketSize = 75;
+const basketY = basket.y;
 
 const bgSound = new Audio("./sound/background.mp3");
 const winSound = new Audio("./sound/game_win.mp3");
@@ -30,9 +36,12 @@ const loseSound = new Audio("./sound/game_lose.mp3");
 const scoring = new Audio("./sound/scoring.mp3");
 
 let started = false;
+let spawned = false;
+
 let timer = undefined;
 let spwaning = undefined;
 let drop = undefined;
+let crack = undefined;
 
 // 게임 버튼 클릭하여 시작 또는 중지
 gameBtn.addEventListener("click", () => {
@@ -59,12 +68,13 @@ function startGame() {
 // 게임 중지
 function stopGame() {
     started = false;
+    spawned = false;
     stopBgSound();
     stopGameTimer();
     hideGameButton();
     showPopUpWithText();
     hideChickens();
-    pauseSpawnEgg();
+    stopSpawnEgg();
 }
 
 // 타이머 시작
@@ -140,8 +150,8 @@ for (let i = 0; i < CHICKEN_COUNT; i++) {
     eggList.push(chicken[i].getBoundingClientRect().x);
 }
 
-// 달걀 생성
-function createEgg(max, min) {
+// 달걀 생성 및 떨어지기
+function placeAndDropEgg(max, min) {
     let num = Math.floor(Math.random() * (max - min)) + min;
     let egg = document.createElement("img");
     egg.setAttribute("src", "./img/egg.png");
@@ -149,46 +159,68 @@ function createEgg(max, min) {
     egg.setAttribute("class", "egg");
     egg.style.position = "absolute";
     egg.style.left = `${eggList[num]}px`;
-    egg.style.top = `96px`;
+    egg.style.top = `${96}px`;
     eggLine.appendChild(egg);
+    spawned = true;
     dropEgg(egg);
 }
 
-// 달걀 배치
+// 달걀 배치 및 떨어지기
 function spawnEgg() {
     let min = 0;
     let max = CHICKEN_COUNT;
     spwaning = setInterval(() => {
-        createEgg(max, min);
+        placeAndDropEgg(max, min);
         playSpawnEgg();
-    }, EGG_DURATION);
+    }, EGG_SPAWN_DURATION);
 }
 
 // 달걀 배치 중지
-function pauseSpawnEgg() {
+function stopSpawnEgg() {
     clearInterval(spwaning);
     while (eggLine.hasChildNodes()) {
         eggLine.removeChild(eggLine.childNodes[0]);
+        stopCrackEgg();
     }
 }
 
 // 달걀 떨어지기
 function dropEgg(egg) {
-    console.log(egg.getBoundingClientRect().y);
+    let eggX = egg.getBoundingClientRect().x;
     let eggY = egg.getBoundingClientRect().y;
     drop = setInterval(() => {
         egg.style.transform = `
             translateY(${eggY++}px)
         `;
-    }, 10);
+        if (eggY === basketY - basketSize) {
+            egg.remove();
+            crackEgg(eggX);
+        }
+    }, EGG_DROP_DURATION);
+}
+
+// 달걀 깨지기
+function crackEgg(eggX) {
+    let cracekdEgg = document.createElement("img");
+    cracekdEgg.setAttribute("src", "./img/cracked-egg.png");
+    cracekdEgg.setAttribute("alt", "crackedEgg");
+    cracekdEgg.setAttribute("class", "crackedEgg");
+    cracekdEgg.style.position = "absolute";
+    cracekdEgg.style.left = `${eggX - 25}px`;
+    if (started && spawned) {
+        playCrackEgg();
+        basketLine.appendChild(cracekdEgg);
+        setTimeout(() => {
+            cracekdEgg.remove();
+        }, 200);
+    } else {
+        stopCrackEgg();
+    }
 }
 
 // 바구니 움직이기
-const basketLineRect = basketLine.getBoundingClientRect();
-const basketSize = 75;
 document.addEventListener("mousemove", (e) => {
     const x = e.clientX;
-
     if (x >= basketLineRect.left + basketSize && x <= basketLineRect.right - basketSize) {
         basket.style.left = `${x - basketLineRect.left}px`;
     }
@@ -206,7 +238,19 @@ function stopBgSound() {
     bgSound.pause();
 }
 
-// 달걀 소환 음악 시작하기
+// 달걀 소환 사운드 시작하기
 function playSpawnEgg() {
     eggSpawnSound.play();
+}
+
+// 달걀 깨지는 사운드 시작하기
+function playCrackEgg() {
+    eggCrackSound.load();
+    eggCrackSound.currentTime = 0.4;
+    eggCrackSound.play();
+}
+
+// 달걀 깨지는 사운드 중지하기
+function stopCrackEgg() {
+    eggCrackSound.pause();
 }
