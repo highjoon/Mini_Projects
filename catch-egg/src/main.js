@@ -1,9 +1,12 @@
 "use strict";
-let GAME_DURATION_SEC = 20;
+let GAME_DURATION_SEC = 60;
 let CHICKEN_COUNT = 6;
-let EGG_SPAWN_DURATION = 1500;
+let EGG_SPAWN_DURATION = 2000;
 let EGG_DROP_DURATION = 5;
-let SCORE = 0;
+let CURRENTSCORE = 0;
+let LEVEL_SCORE = 3;
+let LEVEL = 1;
+let FINAL_LEVEL = 10;
 
 const gameBtn = document.querySelector(".game__button");
 const gameTimer = document.querySelector(".game__timer");
@@ -14,6 +17,7 @@ const fieldRect = field.getBoundingClientRect();
 
 const popUp = document.querySelector(".pop-up");
 const popUpRefreshBtn = document.querySelector(".pop-up__refresh");
+const popUpLevelUpBtn = document.querySelector(".pop-up__levelUp");
 const popUpMessage = document.querySelector(".pop-up__message");
 
 const icon = gameBtn.querySelector(".fas");
@@ -54,15 +58,37 @@ gameBtn.addEventListener("click", () => {
 
 // 게임 재시작 버튼 클릭
 popUpRefreshBtn.addEventListener("click", () => {
+    initGame();
     startGame();
     showGameButton();
     hidePopUp();
 });
 
+// 레벨업 버튼 클릭
+popUpLevelUpBtn.addEventListener("click", () => {
+    levelUp();
+    startGame();
+    showGameButton();
+    hidePopUp();
+});
+
+// 게임 설정 초기화
+function initGame() {
+    GAME_DURATION_SEC = 60;
+    CHICKEN_COUNT = 6;
+    EGG_SPAWN_DURATION = 1500;
+    EGG_DROP_DURATION = 5;
+    CURRENTSCORE = 0;
+    LEVEL_SCORE = 1;
+    LEVEL = 1;
+}
+
 // 게임 시작
 function startGame() {
     started = true;
-    SCORE = 0;
+    CURRENTSCORE = 0;
+    updateScore();
+    showBasket();
     playSound(bgSound);
     startGameTimer();
     showStopButton();
@@ -75,9 +101,10 @@ function stopGame() {
     started = false;
     spawned = false;
     stopSound(bgSound);
+    hideBasket();
     stopGameTimer();
     hideGameButton();
-    showPopUpWithText("REPLAY ?");
+    showPopUpWithText("REPLAY ❓");
     hideChickens();
     stopSpawnEgg();
     playSound(alertSound);
@@ -90,13 +117,16 @@ function finishGame(win) {
     stopSound(bgSound);
     stopGameTimer();
     hideGameButton();
+    hideBasket();
     hideChickens();
     stopSpawnEgg();
-    if (started && spawned) {
-        showPopUpWithText("CONGRATULATIONS !");
+    if (LEVEL === FINAL_LEVEL) {
+        allClear();
+    } else if (win) {
+        showPopUpWithText("CONGRATULATIONS 👏👏👏", win);
         playSound(winSound);
     } else {
-        showPopUpWithText("YOU LOST");
+        showPopUpWithText("YOU LOST 💥💥💥", win);
         playSound(loseSound);
     }
 }
@@ -150,8 +180,15 @@ function showStopButton() {
 }
 
 // 팝업창 표시
-function showPopUpWithText(text) {
-    popUpMessage.innerHTML = text;
+function showPopUpWithText(text, win) {
+    if (win) {
+        let NextLevel = LEVEL + 1;
+        let NextScore = LEVEL_SCORE + 3;
+        popUpMessage.innerHTML = text + "<br/>" + "Next Level : " + NextLevel + "<br/>" + "Next Score : " + NextScore;
+    } else {
+        popUpLevelUpBtn.classList.add("hide");
+        popUpMessage.innerHTML = text + "<br/>" + "Current Level : " + LEVEL;
+    }
     popUp.classList.remove("hide");
 }
 
@@ -168,6 +205,16 @@ function showChickens() {
 // 닭 숨기기
 function hideChickens() {
     chickenFarm.classList.add("hide");
+}
+
+// 바구니 표시
+function showBasket() {
+    basket.classList.remove("hide");
+}
+
+// 바구니 숨기기
+function hideBasket() {
+    basket.classList.add("hide");
 }
 
 const eggList = [];
@@ -223,14 +270,18 @@ function dropEgg(egg) {
                     egg.remove();
                     increaseScore();
                     updateScore();
+                    if (CURRENTSCORE === LEVEL_SCORE) {
+                        spawned = false;
+                        finishGame(true, LEVEL);
+                    }
                 } else {
                     egg.remove();
                     crackEgg(eggX, eggY);
                     decreaseScore();
                     updateScore();
-                    if (SCORE === 0) {
+                    if (CURRENTSCORE === 0) {
                         spawned = false;
-                        finishGame(false);
+                        finishGame(false, LEVEL);
                     }
                 }
             }
@@ -260,19 +311,19 @@ function crackEgg(eggX, eggY) {
 
 // 점수 증가
 function increaseScore() {
-    if (started && spawned) SCORE++;
+    if (started && spawned) CURRENTSCORE++;
     else return;
 }
 
 // 점수 감소
 function decreaseScore() {
-    if (SCORE > 0 && started && spawned) SCORE--;
+    if (CURRENTSCORE > 0 && started && spawned) CURRENTSCORE--;
     else return;
 }
 
 // 점수 갱신
 function updateScore() {
-    gameScore.innerText = SCORE;
+    gameScore.innerText = CURRENTSCORE;
 }
 
 // 바구니 움직이기
@@ -284,9 +335,27 @@ document.addEventListener("mousemove", (e) => {
     }
 });
 
+// 레벨업
+function levelUp() {
+    LEVEL++;
+    LEVEL_SCORE += 3;
+    GAME_DURATION_SEC += 20;
+    EGG_SPAWN_DURATION -= 160;
+}
+
+// 최종 승리
+function allClear() {
+    popUpLevelUpBtn.classList.add("hide");
+    popUpMessage.innerHTML = `All Stage Clear 👍`;
+    popUp.classList.remove("hide");
+}
+
 // 음악 시작하기
 function playSound(sound) {
     sound.load();
+    if (sound === bgSound) {
+        sound.loop = true;
+    }
     sound.play();
 }
 

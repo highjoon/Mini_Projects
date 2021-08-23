@@ -126,15 +126,15 @@ header {
 
 .pop-up {
     border-radius: 20px;
-    width: 400px;
-    height: 130px;
+    width: 800px;
     margin: auto;
     background-color: var(--color-light-black);
     color: var(--color-white);
-    transform: translateY(-400%);
+    transform: translateY(-400px);
 }
 
-.pop-up__refresh {
+.pop-up__refresh,
+.pop-up__levelUp {
     width: 60px;
     height: 60px;
     font-size: 24px;
@@ -146,13 +146,14 @@ header {
     margin-top: 10px;
 }
 
-.pop-up__refresh:hover {
+.pop-up__refresh:hover,
+.pop-up__levelUp:hover {
     transform: scale(1.1);
 }
 
 .pop-up__message {
     display: block;
-    font-size: 38px;
+    font-size: 30px;
 }
 
 .hide {
