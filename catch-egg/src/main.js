@@ -63,7 +63,7 @@ popUpRefreshBtn.addEventListener("click", () => {
 function startGame() {
     started = true;
     SCORE = 0;
-    playBgSound();
+    playSound(bgSound);
     startGameTimer();
     showStopButton();
     showChickens();
@@ -74,26 +74,31 @@ function startGame() {
 function stopGame() {
     started = false;
     spawned = false;
-    stopBgSound();
+    stopSound(bgSound);
     stopGameTimer();
     hideGameButton();
     showPopUpWithText("REPLAY ?");
     hideChickens();
     stopSpawnEgg();
-    playAlert();
+    playSound(alertSound);
 }
 
 // 게임 종료
 function finishGame(win) {
     started = false;
     spawned = false;
-    stopBgSound();
+    stopSound(bgSound);
     stopGameTimer();
     hideGameButton();
-    showPopUpWithText(win ? "CONGRATULATIONS !" : "YOU LOST");
     hideChickens();
     stopSpawnEgg();
-    win ? playWin() : playLose();
+    if (started && spawned) {
+        showPopUpWithText("CONGRATULATIONS !");
+        playSound(winSound);
+    } else {
+        showPopUpWithText("YOU LOST");
+        playSound(loseSound);
+    }
 }
 
 // 타이머 시작
@@ -191,7 +196,7 @@ function spawnEgg() {
     let max = CHICKEN_COUNT;
     spwaning = setInterval(() => {
         placeAndDropEgg(max, min);
-        playSpawnEgg();
+        playSound(eggSpawnSound);
     }, EGG_SPAWN_DURATION);
 }
 
@@ -212,17 +217,22 @@ function dropEgg(egg) {
             translateY(${eggY++}px)
         `;
         if (eggY === basketY - basketSize * 2) {
-            if (eggX >= basketX - Math.floor(basketSize / 2) && eggX <= basketX + (basketSize + Math.floor(basketSize / 2))) {
-                playScoring();
-                egg.remove();
-                increaseScore();
-                updateScore();
-            } else {
-                egg.remove();
-                crackEgg(eggX, eggY);
-                decreaseScore();
-                updateScore();
-                if (SCORE === 0) finishGame(false);
+            if (started && spawned) {
+                if (eggX >= basketX - Math.floor(basketSize / 2) && eggX <= basketX + (basketSize + Math.floor(basketSize / 2))) {
+                    playSound(scoreSound);
+                    egg.remove();
+                    increaseScore();
+                    updateScore();
+                } else {
+                    egg.remove();
+                    crackEgg(eggX, eggY);
+                    decreaseScore();
+                    updateScore();
+                    if (SCORE === 0) {
+                        spawned = false;
+                        finishGame(false);
+                    }
+                }
             }
         }
     }, EGG_DROP_DURATION);
@@ -238,26 +248,26 @@ function crackEgg(eggX, eggY) {
     cracekdEgg.style.left = `${eggX - 25}px`;
     cracekdEgg.style.top = `${eggY + 75}px`;
     if (started && spawned) {
-        playCrackEgg();
+        playSound(eggCrackSound);
         basketLine.appendChild(cracekdEgg);
         setTimeout(() => {
             cracekdEgg.remove();
         }, 200);
     } else {
-        stopCrackEgg();
+        stopSound(eggCrackSound);
     }
 }
 
 // 점수 증가
 function increaseScore() {
-    if (!started) return;
-    SCORE++;
+    if (started && spawned) SCORE++;
+    else return;
 }
 
 // 점수 감소
 function decreaseScore() {
-    if (!started || SCORE <= 0) return;
-    else SCORE--;
+    if (SCORE > 0 && started && spawned) SCORE--;
+    else return;
 }
 
 // 점수 갱신
@@ -274,52 +284,13 @@ document.addEventListener("mousemove", (e) => {
     }
 });
 
-// 배경음악 시작하기
-function playBgSound() {
-    bgSound.load();
-    bgSound.volume = 0.4;
-    bgSound.loop = true;
-    bgSound.play();
+// 음악 시작하기
+function playSound(sound) {
+    sound.load();
+    sound.play();
 }
 
-// 배경음악 정지하기
-function stopBgSound() {
-    bgSound.pause();
-}
-
-// 달걀 소환 사운드 시작하기
-function playSpawnEgg() {
-    eggSpawnSound.play();
-}
-
-// 달걀 깨지는 사운드 시작하기
-function playCrackEgg() {
-    eggCrackSound.load();
-    eggCrackSound.currentTime = 0.4;
-    eggCrackSound.play();
-}
-
-// 달걀 깨지는 사운드 정지하기
-function stopCrackEgg() {
-    eggCrackSound.pause();
-}
-
-// 점수 획득 사운드 시작하기
-function playScoring() {
-    scoreSound.play();
-}
-
-// 승리 사운드 시작하기
-function playWin() {
-    winSound.play();
-}
-
-// 실패 사운드 시작하기
-function playLose() {
-    loseSound.play();
-}
-
-// 알림 사운드 시작하기
-function playAlert() {
-    alertSound.play();
+// 음악 정지하기
+function stopSound(sound) {
+    sound.pause();
 }
