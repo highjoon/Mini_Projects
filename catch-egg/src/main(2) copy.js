@@ -1,5 +1,6 @@
 "use strict";
 let GAME_DURATION_SEC = 60;
+let CHICKEN_COUNT = 6;
 let EGG_SPAWN_DURATION = 2000;
 let EGG_DROP_DURATION = 5;
 let CURRENTSCORE = 0;
@@ -21,7 +22,8 @@ const popUpMessage = document.querySelector(".pop-up__message");
 
 const icon = gameBtn.querySelector(".fas");
 const chickenFarm = document.querySelector(".chicken__farm");
-const chickenFarmRect = chickenFarm.getBoundingClientRect();
+const chicken = document.querySelectorAll(".chicken");
+let chickenHeight = chicken.y;
 
 const eggLine = document.querySelector(".egg__line");
 
@@ -73,12 +75,12 @@ popUpLevelUpBtn.addEventListener("click", () => {
 // 게임 설정 초기화
 function initGame() {
     GAME_DURATION_SEC = 60;
-    EGG_SPAWN_DURATION = 2000;
+    CHICKEN_COUNT = 6;
+    EGG_SPAWN_DURATION = 1500;
     EGG_DROP_DURATION = 5;
     CURRENTSCORE = 0;
-    LEVEL_SCORE = 3;
+    LEVEL_SCORE = 1;
     LEVEL = 1;
-    FINAL_LEVEL = 10;
 }
 
 // 게임 시작
@@ -90,6 +92,7 @@ function startGame() {
     playSound(bgSound);
     startGameTimer();
     showStopButton();
+    showChickens();
     spawnEgg();
 }
 
@@ -102,6 +105,7 @@ function stopGame() {
     stopGameTimer();
     hideGameButton();
     showPopUpWithText("REPLAY ❓");
+    hideChickens();
     stopSpawnEgg();
     playSound(alertSound);
 }
@@ -114,6 +118,7 @@ function finishGame(win) {
     stopGameTimer();
     hideGameButton();
     hideBasket();
+    hideChickens();
     stopSpawnEgg();
     if (LEVEL === FINAL_LEVEL) {
         allClear();
@@ -192,6 +197,16 @@ function hidePopUp() {
     popUp.classList.add("hide");
 }
 
+// 닭 표시
+function showChickens() {
+    chickenFarm.classList.remove("hide");
+}
+
+// 닭 숨기기
+function hideChickens() {
+    chickenFarm.classList.add("hide");
+}
+
 // 바구니 표시
 function showBasket() {
     basket.classList.remove("hide");
@@ -202,27 +217,32 @@ function hideBasket() {
     basket.classList.add("hide");
 }
 
+const eggList = [];
+for (let i = 0; i < CHICKEN_COUNT; i++) {
+    eggList.push(chicken[i].getBoundingClientRect().x);
+}
+
 // 달걀 생성 및 떨어지기
-function placeAndDropEgg() {
-    const x1 = 0;
-    const x2 = chickenFarmRect.width - 90;
-    let num = Math.floor(Math.random() * (x2 - x1)) + x1;
+function placeAndDropEgg(max, min) {
+    let num = Math.floor(Math.random() * (max - min)) + min;
     let egg = document.createElement("img");
     egg.setAttribute("src", "./img/egg.png");
     egg.setAttribute("alt", "egg");
     egg.setAttribute("class", "egg");
     egg.style.position = "absolute";
-    egg.style.left = `${num}px`;
-    egg.style.top = `${20}px`;
+    egg.style.left = `${eggList[num]}px`;
+    egg.style.top = `${96}px`;
     eggLine.appendChild(egg);
     spawned = true;
-    dropEgg(egg, num);
+    // dropEgg(egg);
 }
 
 // 달걀 배치 및 떨어지기
 function spawnEgg() {
+    let min = 0;
+    let max = CHICKEN_COUNT;
     spwaning = setInterval(() => {
-        placeAndDropEgg();
+        placeAndDropEgg(max, min);
         playSound(eggSpawnSound);
     }, EGG_SPAWN_DURATION);
 }
@@ -236,14 +256,14 @@ function stopSpawnEgg() {
 }
 
 // 달걀 떨어지기
-function dropEgg(egg, num) {
-    let eggX = egg.x;
-    let eggY = egg.y;
+function dropEgg(egg) {
+    let eggX = egg.getBoundingClientRect().x;
+    let eggY = egg.getBoundingClientRect().y;
     drop = setInterval(() => {
         egg.style.transform = `
             translateY(${eggY++}px)
         `;
-        if (eggY === basketY - basketSize) {
+        if (eggY === basketY - basketSize * 2) {
             if (started && spawned) {
                 if (eggX >= basketX - Math.floor(basketSize / 2) && eggX <= basketX + (basketSize + Math.floor(basketSize / 2))) {
                     playSound(scoreSound);
@@ -256,7 +276,7 @@ function dropEgg(egg, num) {
                     }
                 } else {
                     egg.remove();
-                    crackEgg(num, eggY);
+                    crackEgg(eggX, eggY);
                     decreaseScore();
                     updateScore();
                     if (CURRENTSCORE === 0) {
@@ -270,14 +290,14 @@ function dropEgg(egg, num) {
 }
 
 // 달걀 깨지기
-function crackEgg(num, eggY) {
+function crackEgg(eggX, eggY) {
     let cracekdEgg = document.createElement("img");
     cracekdEgg.setAttribute("src", "./img/cracked-egg.png");
     cracekdEgg.setAttribute("alt", "crackedEgg");
     cracekdEgg.setAttribute("class", "crackedEgg");
     cracekdEgg.style.position = "absolute";
-    cracekdEgg.style.left = `${num}px`;
-    cracekdEgg.style.top = `${eggY}px`;
+    cracekdEgg.style.left = `${eggX - 25}px`;
+    cracekdEgg.style.top = `${eggY + 75}px`;
     if (started && spawned) {
         playSound(eggCrackSound);
         basketLine.appendChild(cracekdEgg);
@@ -287,7 +307,6 @@ function crackEgg(num, eggY) {
     } else {
         stopSound(eggCrackSound);
     }
-    console.log(`crackedEggX:${cracekdEgg.x} crackedEggY:${cracekdEgg.y}`);
 }
 
 // 점수 증가
