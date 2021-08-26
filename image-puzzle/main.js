@@ -17,3 +17,14 @@ function createImageTiles() {
     return tempArray;
 }
 console.log(createImageTiles());
+
+function shuffle(tiles) {
+    let index = tiles.length - 1;
+    while (index) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [tiles[index], tiles[randomIndex]] = [tiles[randomIndex], tiles[index]];
+        index--;
+    }
+    return tiles;
+}
+console.log(shuffle(createImageTiles()));
