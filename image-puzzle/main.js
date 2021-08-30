@@ -5,6 +5,11 @@ const gameText = document.querySelector(".game-text");
 
 const LIST_CNT = 16;
 const images = [];
+const dragStart = {
+    element: undefined,
+    idx: undefined,
+    className: undefined,
+};
 
 let randomImages = undefined;
 let timeInterval = undefined;
@@ -50,4 +55,36 @@ function startTimer() {
     }, 1000);
 }
 
+// 시작 버튼 이벤트
 startBtn.addEventListener("click", () => startGame());
+
+// 이미지 dragstart 이벤트
+container.addEventListener("dragstart", (e) => {
+    let obj = e.target;
+    dragStart.element = obj;
+    dragStart.className = obj.className;
+    dragStart.idx = Array(...obj.parentNode.children).indexOf(obj);
+});
+
+// 이미지 dragover 중 이벤트 전파 방지
+container.addEventListener("dragover", (e) => e.preventDefault());
+
+// 이미지 drop 이벤트. 이미지 퍼즐 교체
+container.addEventListener("drop", (e) => {
+    let obj = e.target;
+    if (dragStart !== obj.className) {
+        let originPlace = undefined;
+        let isLast = false;
+
+        if (dragStart.element.nextSibling) {
+            originPlace = dragStart.element.nextSibling;
+        } else {
+            originPlace = dragStart.element.previousSibling;
+            isLast = true;
+        }
+
+        const droppedIdx = Array(...obj.parentNode.children).indexOf(obj);
+        dragStart.idx > droppedIdx ? obj.before(dragStart.element) : obj.after(dragStart.element);
+        isLast ? originPlace.after(obj) : originPlace.before(obj);
+    }
+});
