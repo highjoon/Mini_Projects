@@ -7,13 +7,15 @@ const LIST_CNT = 16;
 const images = [];
 
 let randomImages = undefined;
+let timeInterval = undefined;
 
 // 게임 실행
 function startGame() {
     placeImage();
     randomImages = setTimeout(() => {
         shuffle();
-    }, 4000);
+        startTimer();
+    }, 500);
 }
 
 // 이미지 초기 배치
@@ -34,7 +36,18 @@ function shuffle() {
         const randomNumber = Math.floor(Math.random() * (len + 1));
         [images[i], images[randomNumber]] = [images[randomNumber], images[i]];
     }
-    images.forEach((x) => container.appendChild(x));
+    images.forEach((x) => {
+        x.setAttribute("draggable", "true");
+        container.appendChild(x);
+    });
+}
+
+// 타이머 작동
+function startTimer() {
+    let time = 0;
+    timeInterval = setInterval(() => {
+        playTime.innerText = time++;
+    }, 1000);
 }
 
 startBtn.addEventListener("click", () => startGame());
