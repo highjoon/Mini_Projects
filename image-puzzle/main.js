@@ -6,6 +6,16 @@ const gameText = document.querySelector(".game-text");
 const LIST_CNT = 16;
 const images = [];
 
+let randomImages = undefined;
+
+// 게임 실행
+function startGame() {
+    placeImage();
+    randomImages = setTimeout(() => {
+        shuffle();
+    }, 4000);
+}
+
 // 이미지 초기 배치
 function placeImage() {
     for (let i = 0; i < LIST_CNT; i++) {
@@ -26,3 +36,5 @@ function shuffle() {
     }
     images.forEach((x) => container.appendChild(x));
 }
+
+startBtn.addEventListener("click", () => startGame());
