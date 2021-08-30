@@ -1,30 +1,28 @@
-const container = document.querySelector(".image-container");
 const playTime = document.querySelector(".play-time");
-const startButton = document.querySelector(".start-button");
-const gameText = document.querySelector("game-text");
+const container = document.querySelector(".image-container");
+const startBtn = document.querySelector(".start-button");
+const gameText = document.querySelector(".game-text");
 
-const tileCount = 16;
+const LIST_CNT = 16;
+const images = [];
 
-function createImageTiles() {
-    const tempArray = [];
-    for (let i = 1; i <= tileCount; i++) {
-        const li = document.createElement("li");
-        li.setAttribute("data-index", i);
-        li.setAttribute("class", `list${i}`);
-        li.setAttribute("draggable", "true");
-        tempArray.push(li);
+// 이미지 초기 배치
+function placeImage() {
+    for (let i = 0; i < LIST_CNT; i++) {
+        const img = document.createElement("li");
+        img.setAttribute("class", `list${i}`);
+        images.push(img);
     }
-    return tempArray;
+    images.forEach((x) => container.appendChild(x));
 }
-console.log(createImageTiles());
 
-function shuffle(tiles) {
-    let index = tiles.length - 1;
-    while (index) {
-        const randomIndex = Math.floor(Math.random() * (index + 1));
-        [tiles[index], tiles[randomIndex]] = [tiles[randomIndex], tiles[index]];
-        index--;
+// 이미지 랜덤 배치
+function shuffle() {
+    container.innerHTML = "";
+    const len = LIST_CNT - 1;
+    for (let i = 0; i < len; i++) {
+        const randomNumber = Math.floor(Math.random() * (len + 1));
+        [images[i], images[randomNumber]] = [images[randomNumber], images[i]];
     }
-    return tiles;
+    images.forEach((x) => container.appendChild(x));
 }
-console.log(shuffle(createImageTiles()));
