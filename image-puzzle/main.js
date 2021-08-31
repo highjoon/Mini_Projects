@@ -25,6 +25,8 @@ function startGame() {
     endTimer();
     hideGameText();
     showContainer();
+    clearTimeout(randomImages);
+    startBtn.innerText = "Retry";
     tiles = placeImage();
     tiles.forEach((x) => container.appendChild(x));
     randomImages = setTimeout(() => {
@@ -55,8 +57,6 @@ function updateScore(arr) {
 
 // 이미지 초기 배치
 function placeImage() {
-    time = 0;
-    playTime.innerText = time;
     clearContainer();
     const images = [];
     for (let i = 0; i < LIST_CNT; i++) {
